@@ -111,5 +111,42 @@ def test_prediction(index, W1, b1, W2, b2):
     plt.imshow(current_image, interpolation='nearest')
     plt.show()
 
+def accuracy_per_label(Y, predictions, train_labels):
+    labels = np.unique(Y)
+
+    accuracies = []
+    quantities = []
+    for label in labels:
+        # Iterate through possible labels
+        label_mask = Y == label
+        total = np.sum(label_mask)
+        correct = np.sum(predictions[label_mask] == label)
+        accuracy = correct / total if total > 0 else 0
+        accuracies.append(accuracy)
+        quantities.append(np.sum(train_labels == label))
+
+    # Accuracy
+    plt.figure(figsize=(8, 5))
+    plt.bar(labels, accuracies, color='skyblue')
+    plt.xlabel('Digit')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy per digit')
+    plt.ylim(0, 1)
+    plt.grid(axis='y')
+    plt.xticks(labels)
+    plt.show()
+
+    # Database distribution
+    plt.figure(figsize=(8, 5))
+    plt.bar(labels, quantities, color='skyblue')
+    plt.xlabel('Digit')
+    plt.ylabel('Appereances')
+    plt.title('Database appereances per digit')
+    plt.grid(axis='y')
+    plt.xticks(labels)
+    plt.show()
+
+
 test_predictions = make_predictions(test_images, W1, b1, W2, b2)
 print(get_accuracy(test_predictions, test_labels))
+accuracy_per_label(test_labels, test_predictions, train_labels)
