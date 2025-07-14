@@ -1,23 +1,21 @@
 import numpy as np
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 
 train_dataframe = pd.read_csv('data/train.csv')
 train_data = np.array(train_dataframe)
 
-test_dataframe = pd.read_csv('data/test.csv')
-test_data = np.array(test_dataframe)
-
 # m = number of cases to train our model
 # n = size of test case (image_size + label)
 m, n = train_data.shape
+k = 1000 # number of test cases
 
-test_data = test_data.T
+test_data = train_data[0:k].T
 test_labels = test_data[0]
 test_images = test_data[1:n] / 255.
 
-train_data = train_data.T
+train_data = train_data[k:m].T
 train_labels = train_data[0]
 train_images = train_data[1:n] / 255.
 
@@ -96,3 +94,22 @@ def gradient_descent(X, Y, alpha, iterations):
 
 W1, b1, W2, b2 = gradient_descent(train_images, train_labels, 0.1, 500)
 
+def make_predictions(X, W1, b1, W2, b2):
+    _, _, _, A2 = forward_prop(W1, b1, W2, b2, X)
+    predictions = get_predictions(A2)
+    return predictions
+
+def test_prediction(index, W1, b1, W2, b2):
+    current_image = train_data[:, index, None]
+    prediction = make_predictions(current_image, W1, b1, W2, b2)
+    label = train_labels[index]
+    print("Prediction: ", prediction)
+    print("Label: ", label)
+
+    current_image = current_image.reshape((28,28)) * 255
+    plt.gray()
+    plt.imshow(current_image, interpolation='nearest')
+    plt.show()
+
+test_predictions = make_predictions(test_images, W1, b1, W2, b2)
+print(get_accuracy(test_predictions, test_labels))
