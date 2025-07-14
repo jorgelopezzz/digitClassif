@@ -80,16 +80,31 @@ def get_accuracy(predictions, Y):
 def show_accuracy(i, A2, Y):
     print("Iteration: ", i)
     predictions = get_predictions(A2)
-    print(get_accuracy(predictions, Y))
+    return get_accuracy(predictions, Y)
+
+def accuracy_per_iteration(iter_list, accuracy_list):
+    plt.plot(iter_list, accuracy_list)
+    plt.xlabel('Iterations')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy per iteration')
+    plt.grid(True)
+    plt.show()
 
 def gradient_descent(X, Y, alpha, iterations):
     W1, b1, W2, b2 = init_parameters()
+    iter_list = []
+    accuracy_list = []
     for i in range(iterations):
         Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, X)
         dW1, db1, dW2, db2 = backward_prop(Z1, A1, Z2, A2, W1, W2, X, Y)
         W1, b1, W2, b2 = update_parameters(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha)
         if i % 10 == 0:
-            show_accuracy(i, A2, Y)
+            accuracy = show_accuracy(i, A2, Y)
+            print("Accuracy:", accuracy)
+            iter_list.append(i)
+            accuracy_list.append(accuracy)
+
+    accuracy_per_iteration(iter_list, accuracy_list)
     return W1, b1, W2, b2
 
 W1, b1, W2, b2 = gradient_descent(train_images, train_labels, 0.1, 500)
@@ -145,7 +160,6 @@ def accuracy_per_label(Y, predictions, train_labels):
     plt.grid(axis='y')
     plt.xticks(labels)
     plt.show()
-
 
 test_predictions = make_predictions(test_images, W1, b1, W2, b2)
 print(get_accuracy(test_predictions, test_labels))
